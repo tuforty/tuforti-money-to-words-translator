@@ -5,8 +5,8 @@
  */
 
 use PHPUnit\Framework\TestCase;
-use TNkemdilim\MoneyToWords\Converter;
-use TNkemdilim\MoneyToWords\Languages as Language;
+use Tuforti\MoneyToWords\Converter;
+use Tuforti\MoneyToWords\Languages as Language;
 
 class EnglishConversionTest extends TestCase
 {

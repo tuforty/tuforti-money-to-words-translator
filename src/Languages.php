@@ -1,6 +1,6 @@
 <?php
 
-namespace TNkemdilim\MoneyToWords;
+namespace Tuforti\MoneyToWords;
 
 /**
  * Collection of all supported languages.

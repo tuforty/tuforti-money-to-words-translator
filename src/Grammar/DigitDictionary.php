@@ -1,6 +1,6 @@
 <?php
 
-namespace TNkemdilim\MoneyToWords\Grammar;
+namespace Tuforti\MoneyToWords\Grammar;
 
 class DigitDictionary
 {

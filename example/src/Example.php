@@ -2,7 +2,7 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 
-use TNkemdilim\MoneyToWords\Converter;
+use Tuforti\MoneyToWords\Converter;
 
 $converter = new Converter("naira", "kobo");
 

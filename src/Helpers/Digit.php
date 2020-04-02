@@ -1,6 +1,6 @@
 <?php 
 
-namespace TNkemdilim\MoneyToWords\Helpers;
+namespace Tuforti\MoneyToWords\Helpers;
 
 class Digit
 {

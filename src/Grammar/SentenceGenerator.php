@@ -1,9 +1,9 @@
 <?php
 
-namespace TNkemdilim\MoneyToWords\Grammar;
+namespace Tuforti\MoneyToWords\Grammar;
 
-use TNkemdilim\MoneyToWords\Grammar\DigitDictionary;
-use TNkemdilim\MoneyToWords\Helpers\StringProcessing as Str;
+use Tuforti\MoneyToWords\Grammar\DigitDictionary;
+use Tuforti\MoneyToWords\Helpers\StringProcessing as Str;
 
 class SentenceGenerator
 {

@@ -1,10 +1,10 @@
 <?php
 
-namespace TNkemdilim\MoneyToWords\Grammar;
+namespace Tuforti\MoneyToWords\Grammar;
 
 use Exception;
 use Stichoza\GoogleTranslate\GoogleTranslate;
-use TNkemdilim\MoneyToWords\Languages as Language;
+use Tuforti\MoneyToWords\Languages as Language;
 
 class Translator
 {
@@ -18,7 +18,7 @@ class Translator
     /**
      * The language of the money value (numeral) inserted.
      * 
-     * @var TNkemdilim\MoneyToWords\Languages
+     * @var Tuforti\MoneyToWords\Languages
      */
     protected $languageTo;
 
@@ -49,7 +49,7 @@ class Translator
     /**
      * Get the language used for translation.
      *
-     * @return TNkemdilim\MoneyToWords\Languages
+     * @return Tuforti\MoneyToWords\Languages
      */
     public function getDestinationLanguage()
     {

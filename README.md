@@ -36,7 +36,7 @@ Always include **Converter** namespace to your php file
 ### Basic usage
 
 ```php
-use TNkemdilim\MoneyToWords\Converter;
+use Tuforti\MoneyToWords\Converter;
 
 // Nigerian currency : naira & kobo
 $converter = new Converter("naira", "kobo");
@@ -54,8 +54,8 @@ echo ($converter->convert('3453345'));
 To convert money value to other languages, you'll need to import the `Languages` namespace
 
 ```PHP
-use TNkemdilim\MoneyToWords\Converter;
-use TNkemdilim\MoneyToWords\Languages as Language;
+use Tuforti\MoneyToWords\Converter;
+use Tuforti\MoneyToWords\Languages as Language;
 
 $converter = new Converter("naira", "kobo", Language::FRENCH);
 
@@ -98,12 +98,12 @@ echo ($converter->convert('23.3')); // twenty three pounds, 3 pence only.
 
 ## Change Language Translation
 
-Language for translation can be easily changed as follows. All available languages can be accessed via the `TNkemdilim\MoneyToWords\Languages` class.
+Language for translation can be easily changed as follows. All available languages can be accessed via the `Tuforti\MoneyToWords\Languages` class.
 
 See all available in [Languages](./src/Languages.php).
 
 ```PHP
-use TNkemdilim\MoneyToWords\Languages as Language;
+use Tuforti\MoneyToWords\Languages as Language;
 
 $converter->setLanguage(Language::LATIN);
 $converter->setLanguage(Language::SWAHILI);
