@@ -1,23 +1,24 @@
 <?php
 
-namespace TNkemdilim\MoneyToWords\Grammar;
+namespace Tuforti\MoneyToWords\Grammar;
 
-use Stichoza\GoogleTranslate\TranslateClient;
-use TNkemdilim\MoneyToWords\Languages as Language;
+use Exception;
+use Stichoza\GoogleTranslate\GoogleTranslate;
+use Tuforti\MoneyToWords\Languages as Language;
 
 class Translator
 {
     /**
      * Google translator.
      * 
-     * @var Stichoza\GoogleTranslate\TranslateClient
+     * @var Stichoza\GoogleTranslate\GoogleTranslate
      */
     protected $translator;
 
     /**
      * The language of the money value (numeral) inserted.
      * 
-     * @var TNkemdilim\MoneyToWords\Languages
+     * @var Tuforti\MoneyToWords\Languages
      */
     protected $languageTo;
 
@@ -29,7 +30,7 @@ class Translator
     function __construct(String $languageTo)
     {
         $this->languageTo = $languageTo;
-        $this->translator = new TranslateClient(null, $languageTo);
+        $this->translator = new GoogleTranslate($languageTo);
     }
 
     /**
@@ -48,7 +49,7 @@ class Translator
     /**
      * Get the language used for translation.
      *
-     * @return TNkemdilim\MoneyToWords\Languages
+     * @return Tuforti\MoneyToWords\Languages
      */
     public function getDestinationLanguage()
     {
@@ -87,8 +88,7 @@ class Translator
             $translation = $this->translator->translate($string);
         } catch (Exception $ex) {
             throw new Exception("Error translating. Please insert a valid input");
-        }
-        finally {
+        } finally {
             $this->translator->setTarget($this->languageTo);
         }
 

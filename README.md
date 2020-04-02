@@ -23,19 +23,23 @@ composer require tnkemdilim/money-to-words-converter
 }
 ```
 
+## Example
+
+For working example, checkout the [Example folder](./example).
+
 ## Usage
 
 > Note: You should have composer's autoloader included `require 'vendor/autoload.php'`
 
-Always include **Conveter** namespace to your php file
+Always include **Converter** namespace to your php file
 
 ### Basic usage
 
 ```php
-use TNkemdilim\MoneyToWords\Conveter;
+use Tuforti\MoneyToWords\Converter;
 
 // Nigerian currency : naira & kobo
-$converter = new Conveter("naira", "kobo");
+$converter = new Converter("naira", "kobo");
 echo ($converter->convert(374));
 echo ($converter->convert(23.45));
 echo ($converter->convert(748247284782));
@@ -50,10 +54,10 @@ echo ($converter->convert('3453345'));
 To convert money value to other languages, you'll need to import the `Languages` namespace
 
 ```PHP
-use TNkemdilim\MoneyToWords\Conveter;
-use TNkemdilim\MoneyToWords\Languages as Language;
+use Tuforti\MoneyToWords\Converter;
+use Tuforti\MoneyToWords\Languages as Language;
 
-$converter = new Conveter("naira", "kobo", Language::FRENCH);
+$converter = new Converter("naira", "kobo", Language::FRENCH);
 
 echo ($converter->convert(23.45));
 echo ($converter->convert("748247284782"));
@@ -94,19 +98,19 @@ echo ($converter->convert('23.3')); // twenty three pounds, 3 pence only.
 
 ## Change Language Translation
 
-Language for translation can be easily changed as follows. All available languages can be accessed via the `TNkemdilim\MoneyToWords\Languages` class.
+Language for translation can be easily changed as follows. All available languages can be accessed via the `Tuforti\MoneyToWords\Languages` class.
 
 See all available in [Languages](./src/Languages.php).
 
 ```PHP
-use TNkemdilim\MoneyToWords\Languages as Language;
+use Tuforti\MoneyToWords\Languages as Language;
 
 $converter->setLanguage(Language::LATIN);
 $converter->setLanguage(Language::SWAHILI);
 $converter->setLanguage(Language::GREEK);
 ```
 
-## Supported Langauges
+## Supported Languages
 
 For more conversion types
 

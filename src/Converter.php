@@ -12,16 +12,16 @@
  * ALL THE GLORY BE TO CHRIST JESUS.
  */
 
-namespace TNkemdilim\MoneyToWords;
+namespace Tuforti\MoneyToWords;
 
 use Exception;
-use TNkemdilim\MoneyToWords\Helpers\StringProcessing;
-use TNkemdilim\MoneyToWords\Helpers\NumericSystem;
-use TNkemdilim\MoneyToWords\Helpers\Digit;
-use TNkemdilim\MoneyToWords\Languages as Language;
+use Tuforti\MoneyToWords\Helpers\StringProcessing;
+use Tuforti\MoneyToWords\Helpers\NumericSystem;
+use Tuforti\MoneyToWords\Helpers\Digit;
+use Tuforti\MoneyToWords\Languages as Language;
 
-use TNkemdilim\MoneyToWords\Grammar\SentenceGenerator;
-use TNkemdilim\MoneyToWords\Grammar\Translator;
+use Tuforti\MoneyToWords\Grammar\SentenceGenerator;
+use Tuforti\MoneyToWords\Grammar\Translator;
 
 /**
  * USAGE:
@@ -51,7 +51,7 @@ class Converter
     /**
      * Language translator.
      * 
-     * @var TNkemdilim\MoneyToWords\Grammar\Translator
+     * @var Tuforti\MoneyToWords\Grammar\Translator
      */
     protected $translator;
 
@@ -143,8 +143,9 @@ class Converter
         // Translate into greek numeric system of 0 - 9.
         if (!NumericSystem::isGreek($moneyValue)) {
             $moneyValue = $this->translator->toArabic($moneyValue);
-            var_dump($moneyValue);
         }
+
+        $moneyValue = number_format($moneyValue, 2, '.', '');
 
         $isDecimal = Digit::isDecimal($moneyValue);
 
@@ -214,6 +215,11 @@ class Converter
         $whole = SentenceGenerator::generateSentence($this->moneyWholePart);
         $decimal = SentenceGenerator::generateSentence($this->moneyDecimalPart);
 
+        if (!$this->_translationIsEnglish()) {
+            $whole = $this->translator->translate($whole);
+            $decimal = $this->translator->translate($decimal);
+        }
+
         if ($whole != "") {
             $whole .= " " . $this->currencyForWhole;
         }
@@ -224,16 +230,22 @@ class Converter
             $whole .= ", ";
         }
 
-        $sentence = $whole . $decimal;
+        $sentence = trim($whole . $decimal);
 
-        if ($sentence != "") {
-            $sentence .= " only";
+        if ($sentence == "") return $sentence;
+        if ($this->_translationIsEnglish()) return "{$sentence} only";
 
-            if ($this->getTransalationLanguage() != Language::ENGLISH) {
-                return $this->translator->translate($sentence);
-            }
-        }
+        $only = $this->translator->translate('only');
+        return $this->translator->translate("{$sentence} {$only}");
+    }
 
-        return $sentence;
+    /**
+     * Is english the current language for translation.
+     *
+     * @return boolean
+     */
+    private function _translationIsEnglish(): bool
+    {
+        return $this->getTransalationLanguage() == Language::ENGLISH;
     }
 }
