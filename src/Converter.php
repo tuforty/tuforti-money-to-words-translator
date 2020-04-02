@@ -12,16 +12,16 @@
  * ALL THE GLORY BE TO CHRIST JESUS.
  */
 
-namespace TNkemdilim\MoneyToWords;
+namespace Tuforti\MoneyToWords;
 
 use Exception;
-use TNkemdilim\MoneyToWords\Helpers\StringProcessing;
-use TNkemdilim\MoneyToWords\Helpers\NumericSystem;
-use TNkemdilim\MoneyToWords\Helpers\Digit;
-use TNkemdilim\MoneyToWords\Languages as Language;
+use Tuforti\MoneyToWords\Helpers\StringProcessing;
+use Tuforti\MoneyToWords\Helpers\NumericSystem;
+use Tuforti\MoneyToWords\Helpers\Digit;
+use Tuforti\MoneyToWords\Languages as Language;
 
-use TNkemdilim\MoneyToWords\Grammar\SentenceGenerator;
-use TNkemdilim\MoneyToWords\Grammar\Translator;
+use Tuforti\MoneyToWords\Grammar\SentenceGenerator;
+use Tuforti\MoneyToWords\Grammar\Translator;
 
 /**
  * USAGE:
@@ -51,7 +51,7 @@ class Converter
     /**
      * Language translator.
      * 
-     * @var TNkemdilim\MoneyToWords\Grammar\Translator
+     * @var Tuforti\MoneyToWords\Grammar\Translator
      */
     protected $translator;
 
