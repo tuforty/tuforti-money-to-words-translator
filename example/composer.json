@@ -1,5 +1,5 @@
 {
-  "name": "Exmple",
+  "name": "turforti/example-money-to-words-translator",
   "description": "Sample example project",
   "authors": [
     {
@@ -10,6 +10,20 @@
   "minimum-stability": "dev",
   "require": {
     "php": ">=5.5.0",
-    "tnkemdilim/money-to-words-converter": "^2.0"
+    "tuforti/money-to-words-translator": "*"
+  },
+  "repositories": [
+    {
+      "type": "artifact",
+      "url": "artifacts"
+    }
+  ],
+  "scripts": {
+    "archive-package": [
+      "mkdir -p artifacts",
+      "@composer archive --working-dir=../ --ignore-filters --format=zip --dir=example/artifacts --file=some-package"
+    ],
+    "pre-install-cmd": "@archive-package",
+    "pre-update-cmd": "@archive-package"
   }
 }
