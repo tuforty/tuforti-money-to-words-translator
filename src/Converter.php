@@ -200,9 +200,9 @@ class Converter
             return $this->_convertWholePart();
         } catch (ServiceException $ex) {
             $error = json_decode($ex->getMessage())->error;
-            throw new TranslationException($error->message);
+            throw new TranslationException($error->message, $ex->getCode(), $ex->getPrevious());
         } catch (Exception $ex) {
-            throw new Exception("An error occurred while performing translation.");
+            throw new TranslationException($ex, $ex->getCode(), $ex->getPrevious());
         }
     }
 
