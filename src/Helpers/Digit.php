@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Tuforti\MoneyToWords\Helpers;
 
@@ -13,6 +13,6 @@ class Digit
      */
     static function isDecimal($value)
     {
-        return strstr(strval($value), '.');
+        return fmod($value, 1) !== 0.0;
     }
 }
