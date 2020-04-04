@@ -14,7 +14,7 @@ class ArabicConversionTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->converter = new Converter("AIzaSyDT42-Onn3pQM8JnSakvYlhsKR4WCzG47Y", 'ريال', 'هللة', Language::ARABIC);
+        $this->converter = new Converter("", 'ريال', 'هللة', Language::ARABIC);
     }
 
     public function wholeNumberDataProvider()
