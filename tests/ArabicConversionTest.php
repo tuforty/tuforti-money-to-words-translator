@@ -8,13 +8,13 @@ use PHPUnit\Framework\TestCase;
 use Tuforti\MoneyToWords\Converter;
 use Tuforti\MoneyToWords\Languages as Language;
 
-class EnglishConversionTest extends TestCase
+class ArabicConversionTest extends TestCase
 {
     protected $converter;
 
     protected function setUp(): void
     {
-        $this->converter = new Converter("", "naira", "kobo", Language::ENGLISH);
+        $this->converter = new Converter("AIzaSyDT42-Onn3pQM8JnSakvYlhsKR4WCzG47Y", 'ريال', 'هللة', Language::ARABIC);
     }
 
     public function wholeNumberDataProvider()

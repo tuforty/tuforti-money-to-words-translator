@@ -5,8 +5,6 @@
  * 
  * @category Money
  * @author   Tochukwu Nkemdilim <nkemdilimtochukwu@gmail.com>
- * @license  MIT https://github.com/TNkemdilim/Money-To-Words-Converter/licence.md
- * @link     https://github.com/TNkemdilim/Money-To-Words-Converter
  * 
  * Date: 11:22am June-17-2017
  * ALL THE GLORY BE TO CHRIST JESUS.
@@ -15,13 +13,15 @@
 namespace Tuforti\MoneyToWords;
 
 use Exception;
-use Tuforti\MoneyToWords\Helpers\StringProcessing;
-use Tuforti\MoneyToWords\Helpers\NumericSystem;
 use Tuforti\MoneyToWords\Helpers\Digit;
-use Tuforti\MoneyToWords\Languages as Language;
-
-use Tuforti\MoneyToWords\Grammar\SentenceGenerator;
+use Tuforti\MoneyToWords\Contracts\Cache;
 use Tuforti\MoneyToWords\Grammar\Translator;
+use Tuforti\MoneyToWords\Languages as Language;
+use Tuforti\MoneyToWords\Helpers\NumericSystem;
+use Google\Cloud\Core\Exception\ServiceException;
+use Tuforti\MoneyToWords\Grammar\SentenceGenerator;
+use Tuforti\MoneyToWords\Contracts\TranslationLexemes;
+use Tuforti\MoneyToWords\Exception\TranslationException;
 
 /**
  * USAGE:
@@ -77,21 +77,31 @@ class Converter
      */
     protected $currencyForDecimal;
 
+    /**
+     * Original money value provided by the user.
+     *
+     * @var Numeric
+     */
+    protected $money;
 
     /**
      * Create a new money to word converter.
      * 
+     * @param String $googleAuthKey      Google translate authentication key
      * @param String $currencyForWhole   Currency for whole number part of money
      * @param String $languageTo         Language to convert money in words to
      * @param String $currencyForDecimal Currency to use for decimal part of the given monetary value.
+     * @param Cache $cache               Cache implementation for translation.
      */
     function __construct(
+        string $googleAuthKey,
         $currencyForWhole,
         $currencyForDecimal,
-        $languageTo = Language::ENGLISH
+        $languageTo = Language::ENGLISH,
+        $cache = Cache::class
     ) {
         $this->setCurrency(trim($currencyForWhole), trim($currencyForDecimal));
-        $this->translator = new Translator(trim($languageTo));
+        $this->translator = new Translator($googleAuthKey, $cache, trim($languageTo));
     }
 
     /**
@@ -131,6 +141,16 @@ class Converter
     }
 
     /**
+     * Get the translator object.
+     *
+     * @return Translator
+     */
+    public function getTranslator()
+    {
+        return $this->translator;
+    }
+
+    /**
      * Set a new money value for convertion.
      * 
      * @param String $moneyValue Money value to convert
@@ -139,7 +159,7 @@ class Converter
      */
     private function _setMoney(String $moneyValue)
     {
-        $moneyValue = trim($moneyValue);
+        $this->money = $moneyValue = trim($moneyValue);
         // Translate into greek numeric system of 0 - 9.
         if (!NumericSystem::isGreek($moneyValue)) {
             $moneyValue = $this->translator->toArabic($moneyValue);
@@ -166,77 +186,76 @@ class Converter
      * 
      * @param String $moneyValue Money value of any language, in which should be converted to words
      * 
-     * @return String Converted sentence
+     * @return TranslationLexemes LexeConverted sentence
+     * @throws ServiceException|Exception
      */
     public function convert($moneyValue)
     {
-        $this->_setMoney($moneyValue);
+        try {
+            $this->_setMoney($moneyValue);
+            if ($this->isDecimal) {
+                return $this->_convertWholeAndDecimalPart();
+            }
 
-        if ($this->isDecimal) {
-            return $this->_convertWholeAndDecimalPart();
+            return $this->_convertWholePart();
+        } catch (ServiceException $ex) {
+            $error = json_decode($ex->getMessage())->error;
+            throw new TranslationException($error->message);
+        } catch (Exception $ex) {
+            throw new Exception("An error occurred while performing translation.");
         }
-
-        return $this->_convertWholePart();
     }
 
     /**
      * Converts the money value specified into sentence, given that the money 
      * value is a whole number and not a decimal.
      *
-     * @return String
+     * @return TranslationLexemes|null
      */
     private function _convertWholePart()
     {
-        try {
-            $sentence = SentenceGenerator::generateSentence($this->moneyWholePart);
+        $whole = SentenceGenerator::generateSentence($this->moneyWholePart);
+        if (trim($whole) == '') return TranslationLexemes::zero();
 
-            if ($sentence != "") {
-                $sentence .= " " . $this->currencyForWhole . " only";
-
-                if ($this->getTransalationLanguage() != Language::ENGLISH) {
-                    return $this->translator->translate($sentence);
-                }
-            }
-
-            return $sentence;
-        } catch (\Exception $ex) {
-            throw new \Exception("Invalid inputs");
+        $full = "{$whole} {$this->currencyForWhole} only";
+        if ($this->_translationIsEnglish()) {
+            return new TranslationLexemes($whole, null, $full);
         }
+
+        return new TranslationLexemes(
+            $this->translator->translate($whole, $this->moneyWholePart),
+            null,
+            $this->translator->translate($full, $this->money)
+        );
     }
 
     /**
      * Converts the money value specified into sentence, given that the money 
      * value is a decimal.
      *
-     * @return String
+     * @return TranslationLexemes|null
      */
     private function _convertWholeAndDecimalPart()
     {
-        $whole = SentenceGenerator::generateSentence($this->moneyWholePart);
-        $decimal = SentenceGenerator::generateSentence($this->moneyDecimalPart);
+        $whole = trim(SentenceGenerator::generateSentence($this->moneyWholePart));
+        $decimal = trim(SentenceGenerator::generateSentence($this->moneyDecimalPart));
+        if ($whole == '' && $decimal == '') return TranslationLexemes::zero();
 
-        if (!$this->_translationIsEnglish()) {
-            $whole = $this->translator->translate($whole);
-            $decimal = $this->translator->translate($decimal);
+        $full = "";
+        if ($whole != "") $full = "{$whole} {$this->currencyForWhole}";
+        if ($whole != "" && $decimal != "") $full .= ', ';
+        if ($decimal != "") $full .= "{$decimal} {$this->currencyForDecimal}";
+        $full .= " only";
+
+        if ($this->_translationIsEnglish()) {
+            return new TranslationLexemes($whole, $decimal, $full);
         }
 
-        if ($whole != "") {
-            $whole .= " " . $this->currencyForWhole;
-        }
-        if ($decimal != "") {
-            $decimal .= " " . $this->currencyForDecimal;
-        }
-        if ($whole != "" && $decimal != "") {
-            $whole .= ", ";
-        }
-
-        $sentence = trim($whole . $decimal);
-
-        if ($sentence == "") return $sentence;
-        if ($this->_translationIsEnglish()) return "{$sentence} only";
-
-        $only = $this->translator->translate('only');
-        return $this->translator->translate("{$sentence} {$only}");
+        return new TranslationLexemes(
+            $this->translator->translate($whole, $this->moneyWholePart),
+            $this->translator->translate($decimal, $this->moneyDecimalPart),
+            $this->translator->translate($full, $this->money)
+        );
     }
 
     /**
