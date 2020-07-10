@@ -10,7 +10,7 @@
   "minimum-stability": "dev",
   "require": {
     "php": ">=5.5.0",
-    "tuforti/money-to-words-translator": "*"
+    "tuforti/money-to-words-translator": "^1.0"
   },
   "repositories": [
     {
