@@ -2,10 +2,10 @@
 
 namespace Tuforti\MoneyToWords\Grammar;
 
-use Closure;
 use Exception;
 use Tuforti\MoneyToWords\Contracts\Cache;
 use Google\Cloud\Translate\V2\TranslateClient;
+use Tuforti\MoneyToWords\Grammar\SentenceLexer;
 use Tuforti\MoneyToWords\Languages as Language;
 
 class Translator
@@ -110,7 +110,7 @@ class Translator
      * 
      * @return void
      */
-    private function translateTo($moneyInNumeric, $language)
+    public function translateTo($moneyInNumeric, $language)
     {
         $tempLanguageTo = $this->languageTo;
         try {
@@ -128,14 +128,14 @@ class Translator
      *
      * @param string|int $text
      * @param string $language
-     * @param Closure $translate
+     * @param callable $translate
      * @param string $cacheKey
      * @return string|null
      */
     public function getOrTranslate(
         string $text,
         string $language,
-        Closure $translate,
+        callable $translate,
         string $cacheKey = null
     ) {
         $key = $cacheKey ?? $text;
@@ -161,7 +161,7 @@ class Translator
         return $this->getOrTranslate(
             $string,
             Language::ENGLISH,
-            $this->translateTo
+            array($this, 'translateTo')
         );
     }
 
@@ -174,10 +174,12 @@ class Translator
      */
     public function toArabic($string)
     {
-        return $this->getOrTranslate(
+        $translation = $this->getOrTranslate(
             $string,
-            Language::ARABIC,
-            $this->translateTo
+            Language::ENGLISH,
+            array($this, 'translateTo')
         );
+
+        return (new SentenceLexer($translation))->lex();
     }
 }
