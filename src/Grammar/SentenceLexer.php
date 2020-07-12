@@ -33,19 +33,29 @@ class SentenceLexer
      */
     function lex(): string
     {
-        $value = "";
+        $value = $groupTotal = 0;
 
         while ($this->_canLookAhead()) {
-            if ($this->_isWhitespace()) {
+            if ($this->_isNotNeeded()) {
                 $this->_skipWhitespaces();
+                continue;
+            }
+
+            // Sorry about this implementation; we needed a solution that worked asap.
+            $token = $this->_extractNumber();
+            if ($token instanceof StopUnitToken) {
+                $value += $groupTotal * (int) $token->get();
+                $groupTotal = 0;
+            } elseif ($token instanceof BlockUnitToken) {
+                $groupTotal *= (int)$token->get();
             } else {
-                $value .= $this->_extractNumber();
+                $groupTotal += (int)$token;
             }
 
             $this->position++;
         }
 
-        return $value;
+        return $value + $groupTotal;
     }
 
     /**
@@ -53,7 +63,7 @@ class SentenceLexer
      */
     function _skipWhitespaces()
     {
-        while ($this->_canLookAhead() && $this->_isWhitespace()) {
+        while ($this->_canLookAhead() && $this->_isNotNeeded()) {
             $this->position++;
         }
     }
@@ -62,18 +72,17 @@ class SentenceLexer
      * Handle a number from a sequence of characters from the 
      * current lexer cusrsor.
      */
-    function _extractNumber(): string
+    function _extractNumber()
     {
         $fragment = "";
 
-        while ($this->_canLookAhead() && !$this->_isWhitespace()) {
-            $fragment .= strtolower($this->text[$this->position]);
-            $this->position++;
+        while ($this->_canLookAhead() && !$this->_isNotNeeded()) {
+            $fragment .= strtolower($this->text[$this->position++]);
         }
 
 
         $result = $this->_identifyNumber($fragment);
-        return  $result == false ? "" :  $result;
+        return  $result == false ? 0 :  $result;
     }
 
     /**
@@ -85,6 +94,7 @@ class SentenceLexer
     function _identifyNumber(string $fragment)
     {
         if ($this->_isNoisy($fragment)) return false;
+        if ($result = $this->_isStandardUnit($fragment)) return $result;
 
         if ($tens = $this->_isTens($fragment)) {
             $this->_skipWhitespaces();
@@ -103,8 +113,7 @@ class SentenceLexer
      */
     function _isNoisy(string $fragment): bool
     {
-        return $this->_isSeperator($fragment) ||
-            $this->_isStandardUnit($fragment);
+        return $this->_isSeperator($fragment);
     }
 
     /**
@@ -125,13 +134,14 @@ class SentenceLexer
     }
 
     /**
-     * Check if the current cursor character is a whitespace.
+     * Check if the current cursor character is not needed.
      *
      * @return boolean
      */
-    function _isWhitespace(): bool
+    function _isNotNeeded(): bool
     {
-        return $this->text[$this->position] == " ";
+        return $this->text[$this->position] == " " ||
+            $this->text[$this->position] == ",";
     }
 
     /**
@@ -149,40 +159,21 @@ class SentenceLexer
      * Check if a fragment is a currency unit e.g. million, thousand etc.
      *
      * @param string $fragment
-     * @return boolean
+     * @return AbstractToken|false
      */
-    function _isStandardUnit(string $fragment): bool
+    function _isStandardUnit(string $fragment)
     {
         switch ($fragment) {
             case "trillion":
+                return new StopUnitToken(1000000000000);
             case "billion":
+                return new StopUnitToken(1000000000);
             case "million":
+                return new StopUnitToken(1000000);
             case "thousand":
+                return new StopUnitToken(1000);
             case "hundred":
-            case "million":
-            case "milliard":
-            case "billion":
-            case "billiard":
-            case "trillion":
-            case "quadrillion":
-            case "quintillion":
-            case "sextillion":
-            case "septillion":
-            case "octillion":
-            case "nonillion":
-            case "decillion":
-            case "undecillion":
-            case "duodecillion":
-            case "tredecillion":
-            case "quattuordecillion":
-            case "quindecillion":
-            case "sexdecillion":
-            case "septendecillion":
-            case "octodecillion":
-            case "novemdecillion":
-            case "vigintillion":
-            case "centillio":
-                return true;
+                return new BlockUnitToken(100);
 
             default:
                 return false;
@@ -227,7 +218,7 @@ class SentenceLexer
      * @param string $fragment
      * @return integer
      */
-    function _isUnit($fragment)
+    function _isUnit($fragment): int
     {
         switch ($fragment) {
             case 'zero':
@@ -254,4 +245,45 @@ class SentenceLexer
                 return false;
         }
     }
+}
+
+
+/**
+ * Abstract token implementation.
+ */
+abstract class AbstractToken
+{
+    /**
+     * Stored token
+     *
+     * @var object
+     */
+    protected $token;
+
+    function __construct($token)
+    {
+        $this->token = $token;
+    }
+
+    /**
+     * Get the token content.
+     */
+    public function get()
+    {
+        return $this->token;
+    }
+}
+
+/**
+ * Token that stops a group of numbers e.g. million, billion etc.
+ */
+class StopUnitToken extends AbstractToken
+{
+}
+
+/**
+ * Token that stops numbers in a group of numbers (this can only be hundred).
+ */
+class BlockUnitToken extends AbstractToken
+{
 }

@@ -6,7 +6,7 @@ use Tuforti\MoneyToWords\Converter;
 use Tuforti\MoneyToWords\Contracts\Cache;
 
 $converter = new Converter(
-    "AIzaSyDT42-Onn3pQM8JnSakvYlhsKR4WCzG47Y",
+    "some random secret key",
     "naira",
     "kobo",
     $languageTo = "en",

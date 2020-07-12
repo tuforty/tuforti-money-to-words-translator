@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "97674d29d76abe4cfb7129c3a6bab2bd",
+    "content-hash": "b2e23cfce0fb390650b0cef6ebf9a457",
     "packages": [
         {
             "name": "firebase/php-jwt",
@@ -1192,11 +1192,11 @@
         },
         {
             "name": "tuforti/money-to-words-translator",
-            "version": "1.0.0",
+            "version": "3.1.1",
             "dist": {
                 "type": "zip",
                 "url": "artifacts/some-package.zip",
-                "shasum": "ea42cb8beed8363f51230486c179f1e08eda89c7"
+                "shasum": "4634915b5836a92c9ec3475315a430310a4d0359"
             },
             "require": {
                 "google/cloud-translate": "^1.7",
