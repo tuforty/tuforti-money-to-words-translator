@@ -100,6 +100,7 @@ class Converter
         $languageTo = Language::ENGLISH,
         $cache = Cache::class
     ) {
+        SentenceGenerator::setCache($cache);
         $this->setCurrency(trim($currencyForWhole), trim($currencyForDecimal));
         $this->translator = new Translator($googleAuthKey, $cache, trim($languageTo));
     }

@@ -2,11 +2,29 @@
 
 namespace Tuforti\MoneyToWords\Grammar;
 
+use Tuforti\MoneyToWords\Contracts\Cache;
+use Tuforti\MoneyToWords\Languages as Language;
 use Tuforti\MoneyToWords\Grammar\DigitDictionary;
 use Tuforti\MoneyToWords\Helpers\StringProcessing as Str;
 
 class SentenceGenerator
 {
+    /**
+     * Global cache used for storing generated sentences.
+     */
+    static $cache = Cache::class;
+
+    /**
+     * Set the global cache used for senetence generator
+     *
+     * @param $cache
+     * @return void
+     */
+    public static function setCache($cache)
+    {
+        static::$cache = $cache;
+    }
+
     /**
      * Convert a given money value in greek numbers to english sentence.
      *
@@ -16,9 +34,14 @@ class SentenceGenerator
      */
     public static function generateSentence($moneyValue)
     {
-        $moneyValueArray = Str::splitIntoArrayOfSizeThree(strval(intval($moneyValue)));
+        $sentence = static::$cache::get($moneyValue, Language::ENGLISH);
+        if ($sentence) return $sentence;
 
-        return self::_generateSentence($moneyValueArray);
+        $moneyValueArray = Str::splitIntoArrayOfSizeThree(strval(intval($moneyValue)));
+        $sentence = self::_generateSentence($moneyValueArray);
+
+        static::$cache::set($moneyValue, Language::ENGLISH, $sentence);
+        return $sentence;
     }
 
     /**

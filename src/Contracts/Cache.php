@@ -20,7 +20,7 @@ abstract class Cache
      * @param Languages $languageTo
      * @return string
      */
-    private static function key($moneyValue, $languageTo)
+    public static function key($moneyValue, $languageTo)
     {
         return "{$languageTo}-{$moneyValue}";
     }
