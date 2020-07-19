@@ -1320,11 +1320,11 @@
         },
         {
             "name": "tuforti/money-to-words-translator",
-            "version": "3.2.1",
+            "version": "3.2.0",
             "dist": {
                 "type": "zip",
                 "url": "artifacts/some-package.zip",
-                "shasum": "0f4cf3cc172eb696c078e5e12250801f8f0f4e65"
+                "shasum": "b0b0d856d05a1dbce8ff8358810d975a92375c82"
             },
             "require": {
                 "google/cloud-translate": "^1.7",
