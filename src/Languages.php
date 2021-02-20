@@ -2,6 +2,8 @@
 
 namespace Tuforti\MoneyToWords;
 
+use ReflectionClass;
+
 /**
  * Collection of all supported languages.
  */
@@ -71,4 +73,15 @@ class Languages
     const TURKISH = 'tr';
     const URDU = 'ur';
     const WELSH = 'cy';
+
+    /**
+     * Get all supported languages.
+     *
+     * @return array
+     */
+    static function all(): array
+    {
+        $class = new ReflectionClass(Languages::class);
+        return $class->getConstants();
+    }
 }
